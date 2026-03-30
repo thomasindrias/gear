@@ -83,7 +83,7 @@ export default async function ProfilePage({ params }: PageProps) {
   }
 
   const isOwner = currentUserId === profile.users.id;
-  const installCmd = `gear switch @${profile.users.username}/${profile.slug}`;
+  const installCmd = `npx gearsh switch @${profile.users.username}/${profile.slug}`;
 
   // Parse gearfile for structured sections
   let plugins: { name: string; marketplace: string }[] = [];

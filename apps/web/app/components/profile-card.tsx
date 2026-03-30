@@ -16,7 +16,7 @@ interface ProfileCardProps {
 
 export function ProfileCard(props: ProfileCardProps) {
   const [copied, setCopied] = useState(false);
-  const installCmd = `gear switch @${props.username}/${props.slug}`;
+  const installCmd = `npx gearsh switch @${props.username}/${props.slug}`;
 
   const handleCopy = (e: React.MouseEvent) => {
     e.preventDefault();

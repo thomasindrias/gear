@@ -128,7 +128,7 @@ export function LeaderboardTable({
           <p className="text-sm font-mono">No gears found yet.</p>
           <p className="text-sm font-mono mt-1">
             Be the first —{" "}
-            <code className="text-neutral-400">gear push</code>
+            <code className="text-neutral-400">npx gearsh push</code>
           </p>
         </div>
       )}
