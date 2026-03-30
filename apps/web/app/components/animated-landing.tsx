@@ -365,19 +365,6 @@ export function AnimatedQuickStart() {
               <CopyButton text={step.cmd} />
             </div>
 
-            {/* Connector arrow (desktop) */}
-            {i < 2 && (
-              <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 z-10">
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path
-                    d="M4 8h8M9 5l3 3-3 3"
-                    stroke="currentColor"
-                    strokeWidth="1"
-                    className="text-neutral-800"
-                  />
-                </svg>
-              </div>
-            )}
           </motion.div>
         ))}
       </div>
