@@ -1,22 +1,77 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { trpc } from "~/lib/trpc-client";
 
-export function SearchBar() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [query, setQuery] = useState(searchParams.get("q") ?? "");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const params = new URLSearchParams();
-    if (query) params.set("q", query);
-    router.push(`/?${params.toString()}`);
+interface Profile {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  tags: string[];
+  compatibility: string[];
+  downloads_count: number;
+  created_at: string;
+  users: {
+    username: string;
+    avatar_url: string | null;
   };
+}
+
+interface SearchBarProps {
+  onResults: (profiles: Profile[] | null, isSearching: boolean) => void;
+  initialProfiles: Profile[];
+}
+
+export function SearchBar({ onResults, initialProfiles }: SearchBarProps) {
+  const [query, setQuery] = useState("");
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef(false);
+
+  const search = useCallback(
+    async (q: string) => {
+      if (!q.trim()) {
+        onResults(initialProfiles, false);
+        return;
+      }
+
+      onResults(null, true);
+      abortRef.current = false;
+
+      try {
+        const result = await trpc.profile.search.query({ query: q.trim() });
+        if (!abortRef.current) {
+          onResults(result.items as Profile[], false);
+        }
+      } catch {
+        if (!abortRef.current) {
+          onResults(initialProfiles, false);
+        }
+      }
+    },
+    [initialProfiles, onResults],
+  );
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    abortRef.current = true;
+
+    if (!query.trim()) {
+      onResults(initialProfiles, false);
+      return;
+    }
+
+    timerRef.current = setTimeout(() => {
+      search(query);
+    }, 300);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <form onSubmit={handleSubmit} className="relative">
+    <div className="relative">
       <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-600">
         <svg
           width="16"
@@ -42,6 +97,6 @@ export function SearchBar() {
       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-700 text-xs font-mono border border-neutral-800 rounded px-1.5 py-0.5">
         /
       </div>
-    </form>
+    </div>
   );
 }

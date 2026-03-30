@@ -1,45 +1,21 @@
 import { createSupabaseAdmin } from "~/lib/supabase-server";
 import { Nav } from "./components/nav";
-import { SearchBar } from "./components/search-bar";
-import { LeaderboardTable } from "./components/leaderboard-table";
+import { ExploreSection } from "./components/explore-section";
 import {
   AnimatedHero,
   AnimatedQuickStart,
   AnimatedSection,
 } from "./components/animated-landing";
 
-interface PageProps {
-  searchParams: Promise<{ q?: string; tags?: string; sort?: string }>;
-}
-
-export default async function HomePage({ searchParams }: PageProps) {
-  const params = await searchParams;
+export default async function HomePage() {
   const supabase = createSupabaseAdmin();
 
-  let query = supabase
+  const { data: profiles } = await supabase
     .from("profiles")
     .select("*, users!inner(username, avatar_url)")
     .eq("is_public", true)
     .order("downloads_count", { ascending: false })
     .limit(50);
-
-  if (params.q) {
-    query = query.textSearch("search_vector", params.q, { type: "websearch" });
-  }
-
-  if (params.tags) {
-    const tags = params.tags.split(",").filter(Boolean);
-    const compatTags = tags.filter((t) =>
-      ["claude-code", "gemini-cli"].includes(t),
-    );
-    const otherTags = tags.filter(
-      (t) => !["claude-code", "gemini-cli"].includes(t),
-    );
-    if (compatTags.length) query = query.contains("compatibility", compatTags);
-    if (otherTags.length) query = query.contains("tags", otherTags);
-  }
-
-  const { data: profiles } = await query;
 
   return (
     <>
@@ -58,9 +34,7 @@ export default async function HomePage({ searchParams }: PageProps) {
               Explore Gears
             </h2>
 
-            <SearchBar />
-
-            <LeaderboardTable profiles={profiles} />
+            <ExploreSection initialProfiles={profiles ?? []} />
           </AnimatedSection>
         </main>
 

@@ -111,15 +111,28 @@ export const pushCommand = new Command("push")
     }
 
     const client = createGearClient();
-    const result = await client.profile.publish.mutate({
-      slug,
-      name,
-      description,
-      tags,
-      compatibility: gearfile.compatibility,
-      gearfile_content: content,
-      is_public: !opts.private,
-    });
+    let result;
+    try {
+      result = await client.profile.publish.mutate({
+        slug,
+        name,
+        description,
+        tags,
+        compatibility: gearfile.compatibility,
+        gearfile_content: content,
+        is_public: !opts.private,
+      });
+    } catch (err: any) {
+      const message = err?.message ?? "Unknown error";
+      if (message.includes("UNAUTHORIZED") || message.includes("Not authenticated")) {
+        console.error("Error: Not authenticated. Run 'gear login <token>' first.");
+      } else if (message.includes("fetch failed") || message.includes("ECONNREFUSED")) {
+        console.error("Error: Could not connect to the Gear registry. Check your internet connection.");
+      } else {
+        console.error(`Error: ${message}`);
+      }
+      process.exit(1);
+    }
 
     console.log(`\nPublished! View at: gear-beige.vercel.app/@${result.username}/${result.slug}`);
   });

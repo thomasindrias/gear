@@ -24,10 +24,24 @@ export const switchCommand = new Command("switch")
     const client = createGearClient();
 
     console.log(`Downloading @${username}/${slug}...`);
-    const { gearfile_content } = await client.profile.download.query({
-      username: username!,
-      slug: slug!,
-    });
+    let gearfile_content: string;
+    try {
+      const result = await client.profile.download.query({
+        username: username!,
+        slug: slug!,
+      });
+      gearfile_content = result.gearfile_content;
+    } catch (err: any) {
+      const message = err?.message ?? "Unknown error";
+      if (message.includes("not found") || message.includes("NOT_FOUND")) {
+        console.error(`Error: Profile @${username}/${slug} not found.`);
+      } else if (message.includes("fetch failed") || message.includes("ECONNREFUSED")) {
+        console.error("Error: Could not connect to the Gear registry. Check your internet connection.");
+      } else {
+        console.error(`Error: ${message}`);
+      }
+      process.exit(1);
+    }
 
     const { frontmatter: gearfile } = parseGearfile(gearfile_content);
 

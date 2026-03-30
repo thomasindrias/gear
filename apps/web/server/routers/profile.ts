@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 import { router, publicProcedure, authedProcedure } from "../trpc";
 import { parseGearfile } from "gear-shared";
 import { runAudits } from "../lib/auditor";
@@ -84,13 +85,13 @@ export const profileRouter = router({
         .single();
 
       if (error || !data) {
-        throw new Error("Profile not found");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
       }
 
       // Private profiles only visible to owner
       if (!data.is_public) {
         if (!ctx.user || ctx.user.id !== data.users.id) {
-          throw new Error("Profile not found");
+          throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
         }
       }
 
@@ -108,13 +109,13 @@ export const profileRouter = router({
         .single();
 
       if (error || !data) {
-        throw new Error("Profile not found");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
       }
 
       // Private profiles only downloadable by owner
       if (!data.is_public) {
         if (!ctx.user || ctx.user.id !== data.user_id) {
-          throw new Error("Profile not found");
+          throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
         }
       }
 
@@ -223,7 +224,7 @@ export const profileRouter = router({
         .single();
 
       if (!profile) {
-        throw new Error("Profile not found");
+        throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
       }
 
       const newValue = !profile.is_public;

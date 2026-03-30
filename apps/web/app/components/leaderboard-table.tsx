@@ -45,7 +45,7 @@ export function LeaderboardTable({
   const total = profiles?.length ?? 0;
 
   return (
-    <div className="mt-6">
+    <div className="mt-6 min-h-[300px]">
       {/* Sort tabs */}
       <div className="flex items-center gap-6 mb-6 border-b border-neutral-800/40 pb-3">
         <SortTab
