@@ -27,10 +27,10 @@ jobs:
         run: pnpm --filter gear-shared test
 
       - name: Build CLI
-        run: pnpm --filter gearcli build
+        run: pnpm --filter gearsh build
 
       - name: Test CLI
-        run: pnpm --filter gearcli test
+        run: pnpm --filter gearsh test
 
       - name: Publish shared
         run: pnpm --filter gear-shared publish --no-git-checks
@@ -38,6 +38,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish CLI
-        run: pnpm --filter gearcli publish --no-git-checks
+        run: pnpm --filter gearsh publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

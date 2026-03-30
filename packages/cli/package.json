@@ -1,5 +1,5 @@
 {
-  "name": "gearcli",
+  "name": "gearsh",
   "version": "0.1.0",
   "description": "Share and switch AI agent configurations",
   "type": "module",
