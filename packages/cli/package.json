@@ -1,6 +1,6 @@
 {
   "name": "gearsh",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Share and switch AI agent configurations",
   "type": "module",
   "bin": {
