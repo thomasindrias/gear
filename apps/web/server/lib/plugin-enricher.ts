@@ -35,9 +35,15 @@ const MARKETPLACE_MANIFEST_URLS: Record<string, string> = {
     "https://raw.githubusercontent.com/obra/superpowers-marketplace/main/.claude-plugin/marketplace.json",
 };
 
+// skills.sh plugins are also listed in claude-plugins-official, so we fall back to that manifest
+const MARKETPLACE_FALLBACKS: Record<string, string> = {
+  "skills.sh": "claude-plugins-official",
+};
+
 const MARKETPLACE_GITHUB_ORGS: Record<string, { org: string; repo: string }> = {
   "claude-plugins-official": { org: "anthropics", repo: "claude-plugins-official" },
   "superpowers-marketplace": { org: "obra", repo: "superpowers-marketplace" },
+  "skills.sh": { org: "anthropics", repo: "claude-plugins-official" },
 };
 
 function extractGitHubRepo(entry: MarketplaceEntry): string | null {
@@ -104,7 +110,13 @@ export async function enrichPlugins(
 ): Promise<PluginMeta[]> {
   if (plugins.length === 0) return [];
 
-  const marketplaces = [...new Set(plugins.map((p) => p.marketplace))];
+  // Collect all marketplaces including fallbacks
+  const marketplaces = [...new Set(
+    plugins.flatMap((p) => {
+      const fallback = MARKETPLACE_FALLBACKS[p.marketplace];
+      return fallback ? [p.marketplace, fallback] : [p.marketplace];
+    }),
+  )];
   const manifestEntries = await Promise.all(
     marketplaces.map(async (m) => [m, await fetchMarketplaceManifest(m)] as const),
   );
@@ -113,7 +125,14 @@ export async function enrichPlugins(
   const results = await Promise.all(
     plugins.map(async (plugin): Promise<PluginMeta> => {
       const manifest = manifests.get(plugin.marketplace);
-      const entry = manifest?.get(plugin.name);
+      let entry = manifest?.get(plugin.name);
+      // Try fallback marketplace if not found
+      if (!entry) {
+        const fallback = MARKETPLACE_FALLBACKS[plugin.marketplace];
+        if (fallback) {
+          entry = manifests.get(fallback)?.get(plugin.name);
+        }
+      }
 
       let github_url: string | null = null;
       let github_stars: number | null = null;

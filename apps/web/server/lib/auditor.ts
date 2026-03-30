@@ -31,6 +31,7 @@ const PATH_PATTERNS = [
 const VERIFIED_MARKETPLACES = new Set([
   "claude-plugins-official",
   "superpowers-marketplace",
+  "skills.sh",
 ]);
 
 interface PluginInput {
