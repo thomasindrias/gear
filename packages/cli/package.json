@@ -1,0 +1,27 @@
+{
+  "name": "gear-cli",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": {
+    "gear": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@gear/shared": "workspace:*",
+    "@trpc/client": "^11",
+    "commander": "^13",
+    "prompts": "^2.4",
+    "yaml": "^2.7"
+  },
+  "devDependencies": {
+    "@types/prompts": "^2.4",
+    "typescript": "^5.7",
+    "vitest": "^3"
+  }
+}
