@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "pnpm --filter @gear/web build",
+  "installCommand": "pnpm install",
+  "outputDirectory": "apps/web/.next",
+  "framework": "nextjs",
+  "git": {
+    "deploymentEnabled": {
+      "main": true,
+      "feat/*": true
+    }
+  }
+}

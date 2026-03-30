@@ -102,7 +102,7 @@ export const profileRouter = router({
     .query(async ({ ctx, input }) => {
       const { data, error } = await ctx.supabase
         .from("profiles")
-        .select("id, gearfile_content, users!inner(username)")
+        .select("id, gearfile_content, is_public, user_id, users!inner(username)")
         .eq("slug", input.slug)
         .eq("users.username", input.username)
         .single();
@@ -111,7 +111,14 @@ export const profileRouter = router({
         throw new Error("Profile not found");
       }
 
-      ctx.supabase.rpc("increment_downloads", { profile_id: data.id }).then(() => {});
+      // Private profiles only downloadable by owner
+      if (!data.is_public) {
+        if (!ctx.user || ctx.user.id !== data.user_id) {
+          throw new Error("Profile not found");
+        }
+      }
+
+      void ctx.supabase.rpc("increment_downloads", { profile_id: data.id });
 
       return { gearfile_content: data.gearfile_content };
     }),
