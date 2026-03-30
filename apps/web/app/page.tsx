@@ -22,6 +22,7 @@ export default async function HomePage({ searchParams }: PageProps) {
   let query = supabase
     .from("profiles")
     .select("*, users!inner(username, avatar_url)")
+    .eq("is_public", true)
     .order("downloads_count", { ascending: false })
     .limit(50);
 
