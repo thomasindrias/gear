@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import { CopyButton } from "./copy-button";
 import {
@@ -23,11 +23,11 @@ const marqueeAgents = [...agents, ...agents, ...agents];
 
 /* ─── Typing terminal ─── */
 const terminalLines = [
-  { prompt: true, text: "gear switch @indrias/full-stack", delay: 0 },
-  { prompt: false, text: "Downloading gearfile...", delay: 1800 },
-  { prompt: false, text: "Installing 4 plugins, 12 skills, 3 MCP servers", delay: 2600 },
-  { prompt: false, text: "Applying model override: claude-opus-4-20250514", delay: 3400 },
-  { prompt: false, text: "Done. Your agent is ready.", delay: 4200 },
+  { prompt: true, text: "gear switch @indrias/full-stack" },
+  { prompt: false, text: "Downloading gearfile..." },
+  { prompt: false, text: "Installing 4 plugins, 12 skills, 3 MCP servers" },
+  { prompt: false, text: "Applying model override: claude-opus-4-20250514" },
+  { prompt: false, text: "Done. Your agent is ready." },
 ];
 
 function TypingTerminal() {
@@ -38,24 +38,21 @@ function TypingTerminal() {
   const isInView = useInView(ref, { once: true, margin: "-40px" });
 
   useEffect(() => {
-    if (isInView && !started) {
-      setStarted(true);
-    }
+    if (isInView && !started) setStarted(true);
   }, [isInView, started]);
 
   useEffect(() => {
     if (!started) return;
-
     const currentLine = terminalLines[visibleLines];
     if (!currentLine) return;
 
-    const startDelay = visibleLines === 0 ? 600 : 80;
-
     if (currentLine.prompt) {
-      // Type character by character
       if (typedChars < currentLine.text.length) {
         const speed = 30 + Math.random() * 40;
-        const timer = setTimeout(() => setTypedChars((c) => c + 1), typedChars === 0 ? startDelay : speed);
+        const timer = setTimeout(
+          () => setTypedChars((c) => c + 1),
+          typedChars === 0 ? 600 : speed,
+        );
         return () => clearTimeout(timer);
       } else {
         const timer = setTimeout(() => {
@@ -65,7 +62,6 @@ function TypingTerminal() {
         return () => clearTimeout(timer);
       }
     } else {
-      // Appear instantly after delay
       const timer = setTimeout(() => {
         setVisibleLines((l) => l + 1);
         setTypedChars(0);
@@ -75,16 +71,26 @@ function TypingTerminal() {
   }, [started, visibleLines, typedChars]);
 
   return (
-    <div ref={ref} className="w-full max-w-lg mx-auto">
-      <div className="rounded-xl border border-neutral-800 bg-neutral-950/80 backdrop-blur-sm overflow-hidden shadow-2xl shadow-black/50">
+    <div ref={ref} className="w-full max-w-lg mx-auto relative">
+      {/* Soft glow behind terminal */}
+      <div
+        className="absolute -inset-8 rounded-3xl pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, rgba(16,185,129,0.04) 0%, transparent 70%)",
+        }}
+      />
+      <div className="relative rounded-xl border border-neutral-800/80 bg-neutral-950 overflow-hidden shadow-2xl shadow-black/60">
         {/* Title bar */}
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-neutral-800/60 bg-neutral-900/30">
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-neutral-800/50">
           <div className="flex items-center gap-1.5">
-            <div className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
-            <div className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
-            <div className="w-2.5 h-2.5 rounded-full bg-neutral-800" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-800/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-800/80" />
+            <div className="w-2.5 h-2.5 rounded-full bg-neutral-800/80" />
           </div>
-          <span className="text-[10px] font-mono text-neutral-600 ml-2">terminal</span>
+          <span className="text-[10px] font-mono text-neutral-700 ml-2">
+            terminal
+          </span>
         </div>
         {/* Content */}
         <div className="p-4 font-mono text-[13px] leading-6 min-h-[180px]">
@@ -92,14 +98,19 @@ function TypingTerminal() {
             <div key={i} className="flex">
               {line.prompt ? (
                 <>
-                  <span className="text-emerald-500/70 mr-2 select-none">$</span>
+                  <span className="text-emerald-500/70 mr-2 select-none">
+                    $
+                  </span>
                   <span className="text-neutral-200">
                     {i === visibleLines
                       ? line.text.slice(0, typedChars)
                       : line.text}
-                    {i === visibleLines && typedChars < line.text.length && (
-                      <span className="cursor-blink text-emerald-400 ml-px">|</span>
-                    )}
+                    {i === visibleLines &&
+                      typedChars < line.text.length && (
+                        <span className="cursor-blink text-emerald-400 ml-px">
+                          |
+                        </span>
+                      )}
                   </span>
                 </>
               ) : i <= visibleLines ? (
@@ -108,7 +119,7 @@ function TypingTerminal() {
                   animate={{ opacity: 1 }}
                   transition={{ duration: 0.2 }}
                   className={
-                    i === visibleLines - 1 && line.text.startsWith("Done")
+                    line.text.startsWith("Done")
                       ? "text-emerald-400/80"
                       : "text-neutral-500"
                   }
@@ -124,28 +135,34 @@ function TypingTerminal() {
   );
 }
 
-/* ─── Orbiting agent ring ─── */
+/* ─── Agent marquee ─── */
 function AgentOrbit() {
   return (
-    <div className="relative w-full overflow-hidden py-6">
-      {/* Fade edges */}
-      <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-neutral-950 to-transparent z-10 pointer-events-none" />
-      <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-neutral-950 to-transparent z-10 pointer-events-none" />
+    <div className="relative w-full overflow-hidden py-4">
+      {/* Fade edges — match page bg exactly (neutral-950) */}
+      <div className="absolute left-0 top-0 bottom-0 w-28 bg-gradient-to-r from-neutral-950 via-neutral-950/80 to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-28 bg-gradient-to-l from-neutral-950 via-neutral-950/80 to-transparent z-10 pointer-events-none" />
 
       <div className="overflow-hidden">
         <motion.div
-          className="flex items-center gap-16 w-max"
+          className="flex items-center gap-14 w-max"
           animate={{ x: ["0%", "-33.333%"] }}
           transition={{
-            x: { repeat: Infinity, repeatType: "loop", duration: 25, ease: "linear" },
+            x: {
+              repeat: Infinity,
+              repeatType: "loop",
+              duration: 25,
+              ease: "linear",
+            },
           }}
         >
           {marqueeAgents.map((agent, i) => (
-            <div key={`${agent.label}-${i}`} className="flex items-center gap-3 shrink-0 group">
-              <div className="w-9 h-9 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center group-hover:border-neutral-600 group-hover:bg-neutral-800/50 transition-all duration-300">
-                <agent.Icon className="text-neutral-500 group-hover:text-neutral-200 transition-colors duration-300" size={18} />
-              </div>
-              <span className="text-xs font-mono text-neutral-600 group-hover:text-neutral-400 whitespace-nowrap transition-colors duration-300">
+            <div
+              key={`${agent.label}-${i}`}
+              className="flex items-center gap-2.5 shrink-0"
+            >
+              <agent.Icon className="text-neutral-600" size={16} />
+              <span className="text-[11px] font-mono text-neutral-600 whitespace-nowrap">
                 {agent.label}
               </span>
             </div>
@@ -156,46 +173,27 @@ function AgentOrbit() {
   );
 }
 
-/* ─── Counter animation ─── */
-function AnimatedCounter({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="text-center">
-      <div className="text-2xl md:text-3xl font-bold font-mono text-neutral-100">{value}</div>
-      <div className="text-[11px] font-mono text-neutral-600 mt-1 uppercase tracking-wider">{label}</div>
-    </div>
-  );
-}
-
 /* ─── Hero ─── */
 export function AnimatedHero() {
   return (
     <section className="relative pt-20 pb-8 md:pt-32 md:pb-12 text-center overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <motion.div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full"
-          style={{
-            background: "radial-gradient(ellipse, rgba(255,255,255,0.03) 0%, transparent 70%)",
-          }}
-          animate={{
-            scale: [1, 1.1, 1],
-            opacity: [0.5, 0.8, 0.5],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
-      </div>
+      {/* Subtle radial vignette */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse 60% 50% at 50% 30%, rgba(255,255,255,0.02) 0%, transparent 100%)",
+        }}
+      />
 
-      {/* Title with gradient */}
+      {/* Title */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, filter: "blur(10px)" }}
         animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        className="relative"
       >
-        <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-none font-mono uppercase bg-gradient-to-b from-white via-neutral-200 to-neutral-600 bg-clip-text text-transparent pb-2 select-none">
+        <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-none font-mono uppercase bg-gradient-to-b from-white via-neutral-300 to-neutral-700 bg-clip-text text-transparent pb-2 select-none">
           GEAR
         </h1>
       </motion.div>
@@ -209,10 +207,12 @@ export function AnimatedHero() {
       >
         The package manager for AI agent configs.
         <br />
-        <span className="text-neutral-400">Share, discover, and switch in seconds.</span>
+        <span className="text-neutral-400">
+          Share, discover, and switch in seconds.
+        </span>
       </motion.p>
 
-      {/* Terminal demo */}
+      {/* Terminal */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
@@ -227,9 +227,9 @@ export function AnimatedHero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.8 }}
-        className="mt-10"
+        className="mt-12"
       >
-        <div className="text-[10px] tracking-[0.3em] text-neutral-700 uppercase font-mono mb-4">
+        <div className="text-[10px] tracking-[0.3em] text-neutral-700 uppercase font-mono mb-3">
           Works with
         </div>
         <AgentOrbit />
@@ -249,7 +249,15 @@ export function AnimatedQuickStart() {
       title: "Install the CLI",
       cmd: "npm install -g gearsh",
       icon: (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
@@ -260,9 +268,18 @@ export function AnimatedQuickStart() {
       n: 2,
       title: "Browse & install a gear",
       cmd: "gear switch @user/setup",
-      description: "Pick a gear from below or search for the perfect agent config.",
+      description:
+        "Pick a gear from below or search for the perfect agent config.",
       icon: (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.3-4.3" />
         </svg>
@@ -272,9 +289,18 @@ export function AnimatedQuickStart() {
       n: 3,
       title: "Share your setup",
       cmd: "gear push",
-      description: "Scan your local config and publish it for the community.",
+      description:
+        "Scan your local config and publish it for the community.",
       icon: (
-        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          className="w-4 h-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" y1="3" x2="12" y2="15" />
@@ -307,15 +333,17 @@ export function AnimatedQuickStart() {
               delay: 0.1 + i * 0.12,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="group relative rounded-xl border border-neutral-800 bg-neutral-900/30 p-5 hover:border-neutral-700 hover:bg-neutral-900/60 transition-all duration-300 flex flex-col"
+            className="group relative rounded-xl border border-neutral-800/60 bg-neutral-900/20 p-5 hover:border-neutral-700/80 hover:bg-neutral-900/40 transition-all duration-300 flex flex-col"
           >
             {/* Step header */}
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-neutral-800/80 border border-neutral-700/50 flex items-center justify-center text-neutral-400 group-hover:text-neutral-200 group-hover:border-neutral-600 transition-all duration-300">
+              <div className="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800/60 flex items-center justify-center text-neutral-500 group-hover:text-neutral-300 group-hover:border-neutral-700 transition-all duration-300">
                 {step.icon}
               </div>
               <div>
-                <span className="text-[10px] font-mono text-neutral-600 uppercase">Step {step.n}</span>
+                <span className="text-[10px] font-mono text-neutral-700 uppercase">
+                  Step {step.n}
+                </span>
                 <h3 className="text-sm font-medium text-neutral-300 group-hover:text-neutral-100 transition-colors">
                   {step.title}
                 </h3>
@@ -329,19 +357,24 @@ export function AnimatedQuickStart() {
             )}
 
             {/* Command */}
-            <div className="flex items-center gap-2 bg-neutral-950/80 border border-neutral-800 rounded-lg px-3 py-2.5 mt-auto group-hover:border-neutral-700 transition-colors">
+            <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800/50 rounded-lg px-3 py-2.5 mt-auto group-hover:border-neutral-700/60 transition-colors">
               <code className="text-xs text-neutral-400 font-mono flex-1">
-                <span className="text-emerald-600/60">$ </span>
+                <span className="text-neutral-600">$ </span>
                 {step.cmd}
               </code>
               <CopyButton text={step.cmd} />
             </div>
 
-            {/* Connector line between cards (desktop) */}
+            {/* Connector arrow (desktop) */}
             {i < 2 && (
               <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 z-10">
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d="M4 8h8M9 5l3 3-3 3" stroke="currentColor" strokeWidth="1" className="text-neutral-700" />
+                  <path
+                    d="M4 8h8M9 5l3 3-3 3"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    className="text-neutral-800"
+                  />
                 </svg>
               </div>
             )}
@@ -370,11 +403,7 @@ export function AnimatedSection({
       ref={ref}
       initial={{ opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.6,
-        delay,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
       className={className}
     >
       {children}

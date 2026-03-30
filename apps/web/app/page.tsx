@@ -42,9 +42,8 @@ export default async function HomePage({ searchParams }: PageProps) {
   const { data: profiles } = await query;
 
   return (
-    <div className="min-h-screen grid-bg noise">
-      <div className="relative z-10">
-        <Nav />
+    <>
+      <Nav />
         <main className="max-w-5xl mx-auto px-6">
           <AnimatedHero />
 
@@ -95,7 +94,6 @@ export default async function HomePage({ searchParams }: PageProps) {
             </div>
           </div>
         </footer>
-      </div>
-    </div>
+    </>
   );
 }
