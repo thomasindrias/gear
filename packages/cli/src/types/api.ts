@@ -10,6 +10,7 @@ export interface PublishInput {
   tags: string[];
   compatibility: string[];
   gearfile_content: string;
+  is_public?: boolean;
 }
 
 export interface PublishOutput {

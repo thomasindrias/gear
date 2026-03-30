@@ -16,6 +16,7 @@ export const pushCommand = new Command("push")
   .option("--description <desc>", "Description (skips prompt)")
   .option("--tags <tags>", "Comma-separated tags (skips prompt)")
   .option("-y, --yes", "Skip confirmation prompt")
+  .option("--private", "Publish as private (only visible to you)")
   .action(async (opts: {
     dryRun?: boolean;
     platform?: string;
@@ -24,6 +25,7 @@ export const pushCommand = new Command("push")
     description?: string;
     tags?: string;
     yes?: boolean;
+    private?: boolean;
   }) => {
     const config = readConfig();
     const adapter = getAdapter(opts.platform ?? config.platform);
@@ -116,6 +118,7 @@ export const pushCommand = new Command("push")
       tags,
       compatibility: gearfile.compatibility,
       gearfile_content: content,
+      is_public: !opts.private,
     });
 
     console.log(`\nPublished! View at: gear.sh/@${result.username}/${result.slug}`);
