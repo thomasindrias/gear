@@ -5,6 +5,8 @@ import type {
   PublishOutput,
   DownloadInput,
   DownloadOutput,
+  DeleteInput,
+  DeleteOutput,
 } from "./types/api.js";
 
 const DEFAULT_REGISTRY = "https://gear-beige.vercel.app";
@@ -20,6 +22,9 @@ interface GearClient {
     };
     download: {
       query: (input: DownloadInput) => Promise<DownloadOutput>;
+    };
+    delete: {
+      mutate: (input: DeleteInput) => Promise<DeleteOutput>;
     };
   };
 }

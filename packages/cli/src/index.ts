@@ -6,6 +6,7 @@ import { switchCommand } from "./commands/switch.js";
 import { stashCommand } from "./commands/stash.js";
 import { restoreCommand } from "./commands/restore.js";
 import { listCommand } from "./commands/list.js";
+import { deleteCommand } from "./commands/delete.js";
 
 const program = new Command()
   .name("gear")
@@ -18,5 +19,6 @@ program.addCommand(switchCommand);
 program.addCommand(stashCommand);
 program.addCommand(restoreCommand);
 program.addCommand(listCommand);
+program.addCommand(deleteCommand);
 
 program.parse();

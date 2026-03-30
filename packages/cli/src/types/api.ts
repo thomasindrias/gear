@@ -32,3 +32,11 @@ export interface ProfileGetInput {
   username: string;
   slug: string;
 }
+
+export interface DeleteInput {
+  slug: string;
+}
+
+export interface DeleteOutput {
+  success: boolean;
+}

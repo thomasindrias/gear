@@ -203,13 +203,17 @@ export const profileRouter = router({
   delete: authedProcedure
     .input(z.object({ slug: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const { error } = await ctx.supabase
+      const { data, error } = await ctx.supabase
         .from("profiles")
         .delete()
         .eq("user_id", ctx.user.id)
-        .eq("slug", input.slug);
+        .eq("slug", input.slug)
+        .select("id");
 
       if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
+      }
       return { success: true };
     }),
 
