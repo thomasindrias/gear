@@ -1,19 +1,42 @@
 {
   "name": "gear-cli",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "description": "Share and switch AI agent configurations",
   "type": "module",
   "bin": {
     "gear": "./dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "config",
+    "claude",
+    "gemini",
+    "mcp",
+    "gear"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thomasindrias/gear.git",
+    "directory": "packages/cli"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
-    "@gear/shared": "workspace:*",
+    "@gear-cli/shared": "workspace:*",
     "@trpc/client": "^11",
     "commander": "^13",
     "prompts": "^2.4",

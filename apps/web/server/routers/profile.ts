@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { router, publicProcedure, authedProcedure } from "../trpc";
-import { parseGearfile } from "@gear/shared";
+import { parseGearfile } from "@gear-cli/shared";
 import { runAudits } from "../lib/auditor";
 import { enrichPlugins, enrichSkills } from "../lib/plugin-enricher";
 

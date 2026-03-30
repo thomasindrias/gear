@@ -5,7 +5,7 @@ import { createGearClient } from "../trpc-client.js";
 import { getAdapter } from "../adapters/index.js";
 import { scanClaudeCode, scanGeminiCli } from "../scanner.js";
 import { detectSecrets, scrubPaths } from "../sanitizer.js";
-import { serializeGearfile, type Gearfile } from "@gear/shared";
+import { serializeGearfile, type Gearfile } from "@gear-cli/shared";
 
 export const pushCommand = new Command("push")
   .description("Scan, sanitize, and publish your current agent setup")

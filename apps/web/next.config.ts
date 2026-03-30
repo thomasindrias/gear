@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const config: NextConfig = {
-  transpilePackages: ["@gear/shared", "@gear/db"],
+  transpilePackages: ["@gear-cli/shared", "@gear/db"],
 };
 
 export default config;

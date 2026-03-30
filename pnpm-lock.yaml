@@ -17,12 +17,12 @@ importers:
 
   apps/web:
     dependencies:
+      '@gear-cli/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@gear/db':
         specifier: workspace:*
         version: link:../../packages/db
-      '@gear/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@supabase/ssr':
         specifier: ^0.5
         version: 0.5.2(@supabase/supabase-js@2.100.1)
@@ -87,10 +87,13 @@ importers:
       typescript:
         specifier: ^5.7
         version: 5.9.3
+      vitest:
+        specifier: ^3
+        version: 3.2.4(@types/debug@4.1.13)(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3)
 
   packages/cli:
     dependencies:
-      '@gear/shared':
+      '@gear-cli/shared':
         specifier: workspace:*
         version: link:../shared
       '@trpc/client':

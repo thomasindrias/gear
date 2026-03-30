@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { ClaudeCodeAdapter } from "./claude-code.js";
-import { parseGearfile } from "@gear/shared";
+import { parseGearfile } from "@gear-cli/shared";
 import { mkdirSync, readFileSync, writeFileSync, rmSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";

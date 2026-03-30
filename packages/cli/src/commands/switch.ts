@@ -3,7 +3,7 @@ import prompts from "prompts";
 import { readConfig, getGearDir } from "../config.js";
 import { createGearClient } from "../trpc-client.js";
 import { getAdapter } from "../adapters/index.js";
-import { parseGearfile } from "@gear/shared";
+import { parseGearfile } from "@gear-cli/shared";
 import { join } from "node:path";
 import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 

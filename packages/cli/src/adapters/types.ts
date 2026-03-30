@@ -1,4 +1,4 @@
-import type { Gearfile } from "@gear/shared";
+import type { Gearfile } from "@gear-cli/shared";
 
 export interface ConfigPaths {
   settingsFile: string;

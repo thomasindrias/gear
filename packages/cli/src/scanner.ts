@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, readdirSync, lstatSync } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import type { Gearfile } from "@gear/shared";
+import type { Gearfile } from "@gear-cli/shared";
 import { scrubPaths, redactSecrets } from "./sanitizer.js";
 
 interface ScanResult {

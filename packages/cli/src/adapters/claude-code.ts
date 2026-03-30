@@ -7,7 +7,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { homedir } from "node:os";
-import type { Gearfile } from "@gear/shared";
+import type { Gearfile } from "@gear-cli/shared";
 import type { PlatformAdapter, ConfigPaths } from "./types.js";
 
 export class ClaudeCodeAdapter implements PlatformAdapter {
