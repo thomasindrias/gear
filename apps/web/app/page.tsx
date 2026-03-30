@@ -42,7 +42,7 @@ export default async function HomePage() {
         <footer className="border-t border-neutral-800/40">
           <div className="max-w-5xl mx-auto px-6 py-10 flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <span className="text-sm font-mono font-bold text-neutral-400">gear</span>
+              <span className="text-sm font-mono font-bold text-neutral-400">gear<span className="text-emerald-500/60">.</span></span>
               <span className="text-neutral-800">|</span>
               <span className="text-xs font-mono text-neutral-600">
                 the open agent config ecosystem

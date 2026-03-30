@@ -194,7 +194,7 @@ export function AnimatedHero() {
         className="relative"
       >
         <h1 className="text-7xl md:text-9xl font-black tracking-tighter leading-none font-mono uppercase bg-gradient-to-b from-white via-neutral-300 to-neutral-700 bg-clip-text text-transparent pb-2 select-none">
-          GEAR
+          GEAR<span className="text-emerald-500/60">.</span>
         </h1>
       </motion.div>
 
@@ -205,7 +205,7 @@ export function AnimatedHero() {
         transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
         className="text-neutral-500 text-base md:text-lg leading-relaxed mt-4 max-w-md mx-auto"
       >
-        The package manager for AI agent configs.
+        The package manager for <span className="text-emerald-400/70">AI agent configs</span>.
         <br />
         <span className="text-neutral-400">
           Share, discover, and switch in seconds.
@@ -337,7 +337,7 @@ export function AnimatedQuickStart() {
           >
             {/* Step header */}
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800/60 flex items-center justify-center text-neutral-500 group-hover:text-neutral-300 group-hover:border-neutral-700 transition-all duration-300">
+              <div className="w-8 h-8 rounded-lg bg-neutral-900 border border-neutral-800/60 flex items-center justify-center text-neutral-500 group-hover:text-emerald-400 group-hover:border-emerald-500/30 transition-all duration-300">
                 {step.icon}
               </div>
               <div>
@@ -359,7 +359,7 @@ export function AnimatedQuickStart() {
             {/* Command */}
             <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800/50 rounded-lg px-3 py-2.5 mt-auto group-hover:border-neutral-700/60 transition-colors">
               <code className="text-xs text-neutral-400 font-mono flex-1">
-                <span className="text-neutral-600">$ </span>
+                <span className="text-neutral-600 group-hover:text-emerald-500/60 transition-colors">$ </span>
                 {step.cmd}
               </code>
               <CopyButton text={step.cmd} />

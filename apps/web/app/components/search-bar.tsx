@@ -92,7 +92,7 @@ export function SearchBar({ onResults, initialProfiles }: SearchBarProps) {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search gears ..."
-        className="w-full bg-neutral-950 border border-neutral-800/60 rounded-xl pl-11 pr-12 py-3 text-sm text-neutral-200 placeholder:text-neutral-700 focus:outline-none focus:border-neutral-600 font-mono transition"
+        className="w-full bg-neutral-950 border border-neutral-800/60 rounded-xl pl-11 pr-12 py-3 text-sm text-neutral-200 placeholder:text-neutral-700 focus:outline-none font-mono transition search-glow"
       />
       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-700 text-xs font-mono border border-neutral-800 rounded px-1.5 py-0.5">
         /

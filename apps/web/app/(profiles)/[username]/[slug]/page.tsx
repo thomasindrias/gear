@@ -158,7 +158,7 @@ export default async function ProfilePage({ params }: PageProps) {
                   </h1>
                   <a
                     href={`/${profile.users.username}`}
-                    className="text-sm text-neutral-600 font-mono hover:text-neutral-400 transition-colors"
+                    className="text-sm text-neutral-600 font-mono hover:text-emerald-400/70 transition-colors"
                   >
                     @{profile.users.username}/{profile.slug}
                   </a>
@@ -168,7 +168,7 @@ export default async function ProfilePage({ params }: PageProps) {
               {/* Install command */}
               <div className="flex items-center gap-3 bg-neutral-950 border border-neutral-800/60 rounded-xl px-5 py-3.5 shadow-lg shadow-black/20">
                 <code className="text-sm text-neutral-300 font-mono flex-1">
-                  <span className="text-neutral-600">$ </span>
+                  <span className="text-emerald-500/60">$ </span>
                   {installCmd}
                 </code>
                 <CopyButton text={installCmd} />
@@ -261,7 +261,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 {/* Total Installs */}
                 <div className="rounded-xl border border-neutral-800/60 bg-neutral-900/20 p-4 text-center">
                   <div className="text-3xl font-bold font-mono text-neutral-100">
-                    {profile.downloads_count.toLocaleString()}
+                    {profile.downloads_count.toLocaleString()}<span className="text-emerald-500/40 text-lg ml-0.5 align-top">+</span>
                   </div>
                   <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mt-1">
                     Installs

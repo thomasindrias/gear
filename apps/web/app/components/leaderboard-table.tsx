@@ -78,9 +78,13 @@ export function LeaderboardTable({
           <a
             key={profile.id}
             href={`/${profile.users.username}/${profile.slug}`}
-            className="grid grid-cols-[2.5rem_1fr_auto] items-center px-3 py-3.5 hover:bg-neutral-900/40 transition-colors group rounded-lg"
+            className={`grid grid-cols-[2.5rem_1fr_auto] items-center px-3 py-3.5 transition-colors group rounded-lg ${
+              i === 0 ? "rank-gold" : "hover:bg-neutral-900/40"
+            }`}
           >
-            <span className="text-sm font-mono text-neutral-600 tabular-nums">
+            <span className={`text-sm font-mono tabular-nums ${
+              i === 0 ? "text-amber-400/80" : i === 1 ? "text-neutral-400" : i === 2 ? "text-amber-700/60" : "text-neutral-600"
+            }`}>
               {i + 1}
             </span>
             <div className="flex items-center gap-3 min-w-0">
@@ -97,7 +101,7 @@ export function LeaderboardTable({
                 <span className="text-sm font-semibold text-neutral-200 group-hover:text-white transition">
                   {profile.name}
                 </span>
-                <span className="text-sm text-neutral-600 font-mono">
+                <span className="text-sm text-neutral-600 font-mono accent-underline">
                   @{profile.users.username}/{profile.slug}
                 </span>
                 {profile.compatibility.length > 0 && (
@@ -116,7 +120,9 @@ export function LeaderboardTable({
                 )}
               </div>
             </div>
-            <span className="text-sm font-mono text-neutral-500 text-right tabular-nums">
+            <span className={`text-sm font-mono text-right tabular-nums ${
+              i === 0 ? "text-amber-400/70" : "text-neutral-500"
+            }`}>
               {formatCount(profile.downloads_count)}
             </span>
           </a>
@@ -150,7 +156,7 @@ function SortTab({
       onClick={onClick}
       className={`text-sm font-mono transition ${
         active
-          ? "text-neutral-100 underline underline-offset-[14px] decoration-neutral-400"
+          ? "text-neutral-100 underline underline-offset-[14px] decoration-emerald-500/50"
           : "text-neutral-600 hover:text-neutral-400"
       }`}
     >

@@ -8,3 +8,30 @@
 .cursor-blink {
   animation: blink 1s step-end infinite;
 }
+
+/* Search focus glow */
+.search-glow:focus {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.1), 0 0 20px -5px rgba(16, 185, 129, 0.15);
+}
+
+/* Leaderboard row rank highlight for #1 */
+.rank-gold {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.04) 0%, transparent 60%);
+}
+.rank-gold:hover {
+  background: linear-gradient(90deg, rgba(251, 191, 36, 0.08) 0%, transparent 60%);
+}
+
+/* Subtle accent underline on hover */
+.accent-underline {
+  text-decoration: none;
+  background-image: linear-gradient(rgb(16, 185, 129), rgb(16, 185, 129));
+  background-size: 0% 1px;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  transition: background-size 0.3s ease;
+}
+.accent-underline:hover {
+  background-size: 100% 1px;
+}
