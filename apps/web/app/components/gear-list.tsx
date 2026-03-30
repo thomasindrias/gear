@@ -10,7 +10,12 @@ interface Gear {
   name: string;
   is_public: boolean;
   downloads_count: number;
-  users: { username: string }[];
+  users: { username: string } | { username: string }[];
+}
+
+function getUsername(users: Gear["users"]): string {
+  if (Array.isArray(users)) return users[0]?.username ?? "";
+  return users?.username ?? "";
 }
 
 export function GearList() {
@@ -49,13 +54,13 @@ export function GearList() {
         <div key={gear.id} className="flex items-center justify-between py-3">
           <div className="flex items-center gap-3 min-w-0">
             <a
-              href={`/${gear.users[0].username}/${gear.slug}`}
+              href={`/${getUsername(gear.users)}/${gear.slug}`}
               className="text-sm font-mono text-neutral-200 hover:text-white transition"
             >
               {gear.name}
             </a>
             <span className="text-xs text-neutral-600 font-mono">
-              @{gear.users[0].username}/{gear.slug}
+              @{getUsername(gear.users)}/{gear.slug}
             </span>
           </div>
           <div className="flex items-center gap-4">
@@ -74,7 +79,7 @@ export function GearList() {
               </span>
             </button>
             <a
-              href={`/${gear.users[0].username}/${gear.slug}`}
+              href={`/${getUsername(gear.users)}/${gear.slug}`}
               className="text-neutral-600 hover:text-neutral-300 transition"
             >
               →
