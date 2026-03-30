@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { router, publicProcedure, authedProcedure } from "../trpc";
-import { gearfileSchema } from "@gear/shared";
+import { parseGearfile } from "@gear/shared";
+import { runAudits } from "../lib/auditor";
+import { enrichPlugins } from "../lib/plugin-enricher";
 
 const publishInput = z.object({
   slug: z.string(),
@@ -9,6 +11,7 @@ const publishInput = z.object({
   tags: z.array(z.string()),
   compatibility: z.array(z.string()),
   gearfile_content: z.string(),
+  is_public: z.boolean().default(true),
 });
 
 export const profileRouter = router({
@@ -16,6 +19,26 @@ export const profileRouter = router({
     const match = input.gearfile_content.match(/^---\n([\s\S]*?)\n---/);
     if (!match) {
       throw new Error("Invalid Gearfile format");
+    }
+
+    // Extract plugins from gearfile for auditing/enrichment
+    let plugins: { name: string; marketplace: string }[] = [];
+    try {
+      const parsed = parseGearfile(input.gearfile_content);
+      plugins = parsed.frontmatter.plugins ?? [];
+    } catch {
+      // If parsing fails, proceed without plugin data
+    }
+
+    // Run audits
+    const audit_results = runAudits(input.gearfile_content, plugins);
+
+    // Enrich plugin metadata (best-effort)
+    let plugin_metadata = null;
+    try {
+      plugin_metadata = await enrichPlugins(plugins);
+    } catch {
+      // Enrichment failure is non-fatal
     }
 
     const { data, error } = await ctx.supabase
@@ -29,6 +52,9 @@ export const profileRouter = router({
           tags: input.tags,
           compatibility: input.compatibility,
           gearfile_content: input.gearfile_content,
+          is_public: input.is_public,
+          audit_results,
+          plugin_metadata,
         },
         { onConflict: "user_id,slug" },
       )
@@ -44,7 +70,7 @@ export const profileRouter = router({
     .query(async ({ ctx, input }) => {
       const { data, error } = await ctx.supabase
         .from("profiles")
-        .select("*, users!inner(username, avatar_url)")
+        .select("*, users!inner(id, username, avatar_url)")
         .eq("slug", input.slug)
         .eq("users.username", input.username)
         .single();
@@ -52,6 +78,14 @@ export const profileRouter = router({
       if (error || !data) {
         throw new Error("Profile not found");
       }
+
+      // Private profiles only visible to owner
+      if (!data.is_public) {
+        if (!ctx.user || ctx.user.id !== data.users.id) {
+          throw new Error("Profile not found");
+        }
+      }
+
       return data;
     }),
 
@@ -90,6 +124,8 @@ export const profileRouter = router({
         .select("*, users!inner(username, avatar_url)")
         .order("downloads_count", { ascending: false })
         .limit(input.limit + 1);
+
+      q = q.eq("is_public", true);
 
       if (input.query) {
         q = q.textSearch("search_vector", input.query, { type: "websearch" });
@@ -131,6 +167,8 @@ export const profileRouter = router({
         .order(orderCol, { ascending: false })
         .limit(input.limit + 1);
 
+      q = q.eq("is_public", true);
+
       if (input.cursor) {
         q = q.lt("id", input.cursor);
       }
@@ -158,4 +196,39 @@ export const profileRouter = router({
       if (error) throw error;
       return { success: true };
     }),
+
+  toggleVisibility: authedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { data: profile } = await ctx.supabase
+        .from("profiles")
+        .select("id, is_public, user_id")
+        .eq("id", input.id)
+        .eq("user_id", ctx.user.id)
+        .single();
+
+      if (!profile) {
+        throw new Error("Profile not found");
+      }
+
+      const newValue = !profile.is_public;
+      const { error } = await ctx.supabase
+        .from("profiles")
+        .update({ is_public: newValue })
+        .eq("id", input.id);
+
+      if (error) throw error;
+      return { is_public: newValue };
+    }),
+
+  listOwn: authedProcedure.query(async ({ ctx }) => {
+    const { data, error } = await ctx.supabase
+      .from("profiles")
+      .select("id, slug, name, is_public, downloads_count, created_at, users!inner(username)")
+      .eq("user_id", ctx.user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return data ?? [];
+  }),
 });
