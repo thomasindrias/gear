@@ -1,5 +1,5 @@
 {
-  "name": "gear-cli",
+  "name": "gearcli",
   "version": "0.1.0",
   "description": "Share and switch AI agent configurations",
   "type": "module",
@@ -36,7 +36,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@gear-cli/shared": "workspace:*",
+    "gear-shared": "workspace:*",
     "@trpc/client": "^11",
     "commander": "^13",
     "prompts": "^2.4",

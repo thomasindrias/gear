@@ -21,23 +21,23 @@ jobs:
       - run: pnpm install
 
       - name: Build shared
-        run: pnpm --filter @gear-cli/shared build
+        run: pnpm --filter gear-shared build
 
       - name: Test shared
-        run: pnpm --filter @gear-cli/shared test
+        run: pnpm --filter gear-shared test
 
       - name: Build CLI
-        run: pnpm --filter gear-cli build
+        run: pnpm --filter gearcli build
 
       - name: Test CLI
-        run: pnpm --filter gear-cli test
+        run: pnpm --filter gearcli test
 
       - name: Publish shared
-        run: pnpm --filter @gear-cli/shared publish --no-git-checks
+        run: pnpm --filter gear-shared publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Publish CLI
-        run: pnpm --filter gear-cli publish --no-git-checks
+        run: pnpm --filter gearcli publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

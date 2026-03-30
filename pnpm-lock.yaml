@@ -17,9 +17,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@gear-cli/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@gear/db':
         specifier: workspace:*
         version: link:../../packages/db
@@ -47,6 +44,9 @@ importers:
       framer-motion:
         specifier: ^11
         version: 11.18.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      gear-shared:
+        specifier: workspace:*
+        version: link:../../packages/shared
       next:
         specifier: ^15
         version: 15.5.14(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -93,15 +93,15 @@ importers:
 
   packages/cli:
     dependencies:
-      '@gear-cli/shared':
-        specifier: workspace:*
-        version: link:../shared
       '@trpc/client':
         specifier: ^11
         version: 11.16.0(@trpc/server@11.16.0(typescript@5.9.3))(typescript@5.9.3)
       commander:
         specifier: ^13
         version: 13.1.0
+      gear-shared:
+        specifier: workspace:*
+        version: link:../shared
       prompts:
         specifier: ^2.4
         version: 2.4.2

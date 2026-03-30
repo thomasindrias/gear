@@ -10,7 +10,7 @@ import { AuditBadges } from "~/app/components/audit-badges";
 import { VisibilityToggle } from "~/app/components/visibility-toggle";
 import { RawGearfile } from "~/app/components/raw-gearfile";
 import { CompatibilityBadge } from "~/app/components/compatibility-badge";
-import { parseGearfile } from "@gear-cli/shared";
+import { parseGearfile } from "gear-shared";
 
 interface PageProps {
   params: Promise<{ username: string; slug: string }>;
