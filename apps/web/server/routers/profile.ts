@@ -2,7 +2,7 @@ import { z } from "zod";
 import { router, publicProcedure, authedProcedure } from "../trpc";
 import { parseGearfile } from "@gear/shared";
 import { runAudits } from "../lib/auditor";
-import { enrichPlugins } from "../lib/plugin-enricher";
+import { enrichPlugins, enrichSkills } from "../lib/plugin-enricher";
 
 const publishInput = z.object({
   slug: z.string(),
@@ -21,22 +21,29 @@ export const profileRouter = router({
       throw new Error("Invalid Gearfile format");
     }
 
-    // Extract plugins from gearfile for auditing/enrichment
+    // Extract plugins and skills from gearfile for auditing/enrichment
     let plugins: { name: string; marketplace: string }[] = [];
+    let skills: { name: string; source: string }[] = [];
     try {
       const parsed = parseGearfile(input.gearfile_content);
       plugins = parsed.frontmatter.plugins ?? [];
+      skills = parsed.frontmatter.skills ?? [];
     } catch {
-      // If parsing fails, proceed without plugin data
+      // If parsing fails, proceed without plugin/skill data
     }
 
     // Run audits
     const audit_results = runAudits(input.gearfile_content, plugins);
 
-    // Enrich plugin metadata (best-effort)
+    // Enrich plugin metadata (GitHub stars) and skill metadata (skills.sh URLs)
     let plugin_metadata = null;
+    let skill_metadata = null;
     try {
-      plugin_metadata = await enrichPlugins(plugins);
+      const marketplaces = [...new Set(plugins.map((p) => p.marketplace))];
+      [plugin_metadata, skill_metadata] = await Promise.all([
+        enrichPlugins(plugins),
+        enrichSkills(skills, marketplaces),
+      ]);
     } catch {
       // Enrichment failure is non-fatal
     }
@@ -55,6 +62,7 @@ export const profileRouter = router({
           is_public: input.is_public,
           audit_results,
           plugin_metadata,
+          skill_metadata,
         },
         { onConflict: "user_id,slug" },
       )

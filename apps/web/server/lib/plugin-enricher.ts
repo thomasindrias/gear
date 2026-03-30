@@ -3,12 +3,21 @@ export interface PluginMeta {
   marketplace: string;
   github_stars: number | null;
   github_url: string | null;
+}
+
+export interface SkillMeta {
+  name: string;
   skills_sh_url: string | null;
 }
 
 interface PluginInput {
   name: string;
   marketplace: string;
+}
+
+interface SkillInput {
+  name: string;
+  source: string;
 }
 
 interface MarketplaceEntry {
@@ -32,19 +41,13 @@ const MARKETPLACE_GITHUB_ORGS: Record<string, { org: string; repo: string }> = {
 };
 
 function extractGitHubRepo(entry: MarketplaceEntry): string | null {
-  // Try source.url first (external plugins)
   if (typeof entry.source === "object" && entry.source.url) {
     const url = entry.source.url;
-    // Handle full GitHub URLs: https://github.com/owner/repo.git
-    const fullMatch = url.match(
-      /github\.com\/([^/]+\/[^/.]+)/,
-    );
+    const fullMatch = url.match(/github\.com\/([^/]+\/[^/.]+)/);
     if (fullMatch) return fullMatch[1];
-    // Handle short form: owner/repo
     if (url.match(/^[^/]+\/[^/]+$/)) return url;
   }
 
-  // Try homepage
   if (entry.homepage) {
     const match = entry.homepage.match(
       /github\.com\/([^/]+\/[^/]+?)(?:\/|\.git|$)/,
@@ -96,37 +99,17 @@ async function fetchGitHubStars(repoPath: string): Promise<number | null> {
   }
 }
 
-function buildSkillsShUrl(
-  pluginName: string,
-  marketplace: string,
-  githubRepo: string | null,
-): string | null {
-  // skills.sh URL format: /{org}/{repo}/{plugin-name}
-  // First try using the marketplace org/repo as the skills.sh path
-  const marketplaceInfo = MARKETPLACE_GITHUB_ORGS[marketplace];
-  if (marketplaceInfo) {
-    return `https://skills.sh/${marketplaceInfo.org}/${marketplaceInfo.repo}/${pluginName}`;
-  }
-  // For unknown marketplaces, try the GitHub repo if we have one
-  if (githubRepo) {
-    return `https://skills.sh/${githubRepo}/${pluginName}`;
-  }
-  return null;
-}
-
 export async function enrichPlugins(
   plugins: PluginInput[],
 ): Promise<PluginMeta[]> {
   if (plugins.length === 0) return [];
 
-  // Fetch all unique marketplace manifests in parallel
   const marketplaces = [...new Set(plugins.map((p) => p.marketplace))];
   const manifestEntries = await Promise.all(
     marketplaces.map(async (m) => [m, await fetchMarketplaceManifest(m)] as const),
   );
   const manifests = new Map(manifestEntries);
 
-  // Enrich each plugin in parallel
   const results = await Promise.all(
     plugins.map(async (plugin): Promise<PluginMeta> => {
       const manifest = manifests.get(plugin.marketplace);
@@ -143,19 +126,56 @@ export async function enrichPlugins(
         }
       }
 
-      const skills_sh_url = buildSkillsShUrl(
-        plugin.name,
-        plugin.marketplace,
-        null,
-      );
-
       return {
         name: plugin.name,
         marketplace: plugin.marketplace,
         github_stars,
         github_url,
-        skills_sh_url,
       };
+    }),
+  );
+
+  return results;
+}
+
+async function checkSkillsShUrl(
+  skillName: string,
+  marketplace: string,
+): Promise<string | null> {
+  const info = MARKETPLACE_GITHUB_ORGS[marketplace];
+  if (!info) return null;
+
+  const url = `https://skills.sh/${info.org}/${info.repo}/${skillName}`;
+  try {
+    const res = await fetch(url, {
+      method: "HEAD",
+      signal: AbortSignal.timeout(FETCH_TIMEOUT),
+    });
+    return res.ok ? url : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function enrichSkills(
+  skills: SkillInput[],
+  pluginMarketplaces: string[],
+): Promise<SkillMeta[]> {
+  if (skills.length === 0) return [];
+
+  // Try each known marketplace for each skill
+  const knownMarketplaces = [...new Set(pluginMarketplaces)].filter(
+    (m) => MARKETPLACE_GITHUB_ORGS[m],
+  );
+
+  const results = await Promise.all(
+    skills.map(async (skill): Promise<SkillMeta> => {
+      // Try each marketplace to find the skill on skills.sh
+      for (const marketplace of knownMarketplaces) {
+        const url = await checkSkillsShUrl(skill.name, marketplace);
+        if (url) return { name: skill.name, skills_sh_url: url };
+      }
+      return { name: skill.name, skills_sh_url: null };
     }),
   );
 

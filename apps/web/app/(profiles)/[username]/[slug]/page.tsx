@@ -125,7 +125,7 @@ export default async function ProfilePage({ params }: PageProps) {
             <PluginList plugins={plugins} metadata={profile.plugin_metadata} />
 
             {/* Skills */}
-            <SkillPills skills={skills} pluginMeta={profile.plugin_metadata} />
+            <SkillPills skills={skills} skillMeta={profile.skill_metadata} />
 
             {/* MCP Servers */}
             <div>

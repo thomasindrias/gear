@@ -3,20 +3,17 @@ interface Skill {
   source: string;
 }
 
-interface PluginMeta {
+interface SkillMeta {
   name: string;
-  marketplace: string;
-  github_stars: number | null;
-  github_url: string | null;
   skills_sh_url: string | null;
 }
 
 export function SkillPills({
   skills,
-  pluginMeta,
+  skillMeta,
 }: {
   skills: Skill[];
-  pluginMeta: PluginMeta[] | null;
+  skillMeta: SkillMeta[] | null;
 }) {
   if (skills.length === 0) {
     return (
@@ -30,7 +27,7 @@ export function SkillPills({
   }
 
   const metaByName = new Map(
-    (pluginMeta ?? []).map((m) => [m.name, m]),
+    (skillMeta ?? []).map((m) => [m.name, m]),
   );
 
   return (

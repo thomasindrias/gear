@@ -7,7 +7,6 @@ interface PluginMeta {
   marketplace: string;
   github_stars: number | null;
   github_url: string | null;
-  skills_sh_url: string | null;
 }
 
 interface GearfilePlugin {
@@ -86,16 +85,6 @@ export function PluginList({
                     ★ {formatStars(meta.github_stars)}
                   </span>
                 )}
-                {meta?.skills_sh_url ? (
-                  <a
-                    href={meta.skills_sh_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[10px] text-neutral-500 bg-neutral-900 border border-neutral-800 px-2 py-0.5 rounded font-mono hover:border-neutral-600 hover:text-neutral-300 transition"
-                  >
-                    skills.sh ↗
-                  </a>
-                ) : null}
               </div>
             </div>
           );
