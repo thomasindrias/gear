@@ -6,6 +6,7 @@ interface PluginMeta {
   name: string;
   marketplace: string;
   github_stars: number | null;
+  github_url: string | null;
   skills_sh_url: string | null;
 }
 
@@ -70,7 +71,17 @@ export function PluginList({
                 </span>
               </div>
               <div className="flex items-center gap-3">
-                {meta?.github_stars != null && (
+                {meta?.github_stars != null && meta?.github_url && (
+                  <a
+                    href={meta.github_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-neutral-600 font-mono flex items-center gap-1 hover:text-neutral-300 transition"
+                  >
+                    ★ {formatStars(meta.github_stars)}
+                  </a>
+                )}
+                {meta?.github_stars != null && !meta?.github_url && (
                   <span className="text-xs text-neutral-600 font-mono flex items-center gap-1">
                     ★ {formatStars(meta.github_stars)}
                   </span>

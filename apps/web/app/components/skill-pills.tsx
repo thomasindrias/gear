@@ -7,6 +7,7 @@ interface PluginMeta {
   name: string;
   marketplace: string;
   github_stars: number | null;
+  github_url: string | null;
   skills_sh_url: string | null;
 }
 
