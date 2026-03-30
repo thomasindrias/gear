@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createSupabaseAdmin } from "~/lib/supabase-server";
 import { createSupabaseSSR } from "~/lib/supabase-ssr";
@@ -13,6 +14,41 @@ import { parseGearfile } from "@gear/shared";
 
 interface PageProps {
   params: Promise<{ username: string; slug: string }>;
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const { username, slug } = await params;
+  const supabase = createSupabaseAdmin();
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("name, description, is_public, users!inner(username)")
+    .eq("slug", slug)
+    .eq("users.username", username)
+    .single();
+
+  if (!profile || !profile.is_public) {
+    return { title: "Not Found" };
+  }
+
+  const title = `${profile.name} by @${username}`;
+  const description = profile.description || `AI agent configuration by @${username}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      url: `/${username}/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
 }
 
 export default async function ProfilePage({ params }: PageProps) {
@@ -74,8 +110,34 @@ export default async function ProfilePage({ params }: PageProps) {
     // If parsing fails, show raw content only
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: profile.name,
+    description: profile.description,
+    author: {
+      "@type": "Person",
+      name: profile.users.username,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear.sh"}/${profile.users.username}`,
+    },
+    applicationCategory: "AI Agent Configuration",
+    operatingSystem: profile.compatibility?.join(", ") ?? "Any",
+    softwareVersion: version,
+    interactionStatistic: {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/DownloadAction",
+      userInteractionCount: profile.downloads_count,
+    },
+    datePublished: profile.created_at,
+    dateModified: profile.updated_at,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Nav />
       <main className="max-w-5xl mx-auto px-6 py-12">
         <div className="flex flex-col md:flex-row gap-10 md:gap-12">

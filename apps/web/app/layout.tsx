@@ -8,10 +8,31 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear.sh";
+
 export const metadata: Metadata = {
-  title: "Gear — Share & Switch Agent Configs",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Gear — Share & Switch Agent Configs",
+    template: "%s | Gear",
+  },
   description:
     "Discover, share, and hot-swap AI agent configurations. Like nvm, but for agentic environments.",
+  openGraph: {
+    type: "website",
+    siteName: "Gear",
+    title: "Gear — Share & Switch Agent Configs",
+    description:
+      "Discover, share, and hot-swap AI agent configurations. Like nvm, but for agentic environments.",
+    url: siteUrl,
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
