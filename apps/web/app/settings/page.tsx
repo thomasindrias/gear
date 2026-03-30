@@ -5,7 +5,9 @@ import { TokenManager } from "./token-manager";
 
 export default async function SettingsPage() {
   const supabase = await createSupabaseSSR();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/auth/login");
@@ -14,8 +16,8 @@ export default async function SettingsPage() {
   return (
     <>
       <Nav />
-      <main className="max-w-2xl mx-auto px-6 py-12">
-        <h1 className="text-2xl font-bold mb-8">Settings</h1>
+      <main className="max-w-5xl mx-auto px-6 py-12">
+        <h1 className="text-2xl font-bold tracking-tight mb-8">Settings</h1>
         <TokenManager />
       </main>
     </>

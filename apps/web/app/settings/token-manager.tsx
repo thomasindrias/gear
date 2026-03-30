@@ -23,7 +23,9 @@ export function TokenManager() {
     setLoading(false);
   };
 
-  useEffect(() => { loadTokens(); }, []);
+  useEffect(() => {
+    loadTokens();
+  }, []);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,10 +43,14 @@ export function TokenManager() {
 
   return (
     <div className="space-y-6">
-      <h2 className="text-lg font-semibold">CLI Tokens</h2>
-      <p className="text-sm text-neutral-400">
-        Generate a personal access token to authenticate the Gear CLI.
-      </p>
+      <div>
+        <h2 className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-2">
+          CLI Tokens
+        </h2>
+        <p className="text-sm text-neutral-500">
+          Generate a personal access token to authenticate the Gear CLI.
+        </p>
+      </div>
 
       <form onSubmit={handleCreate} className="flex gap-2">
         <input
@@ -52,55 +58,80 @@ export function TokenManager() {
           value={newTokenName}
           onChange={(e) => setNewTokenName(e.target.value)}
           placeholder="Token name (e.g., MacBook Pro)"
-          className="flex-1 bg-neutral-900 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:outline-none focus:border-amber-500/50"
+          className="flex-1 bg-transparent border border-neutral-800 rounded-lg px-3 py-2.5 text-sm text-neutral-200 placeholder:text-neutral-600 focus:outline-none focus:border-neutral-600 font-mono transition"
         />
         <button
           type="submit"
-          className="bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 text-amber-400 rounded-lg px-4 py-2 text-sm transition"
+          className="bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 rounded-lg px-4 py-2.5 text-sm font-mono transition"
         >
-          Generate Token
+          Generate
         </button>
       </form>
 
       {createdToken && (
-        <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-          <p className="text-sm text-green-400 mb-2">
-            Token created! Copy it now — you won&apos;t see it again.
+        <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-4">
+          <p className="text-sm text-neutral-300 mb-2 font-mono">
+            Token created — copy it now, you won&apos;t see it again.
           </p>
-          <code className="block bg-neutral-900 rounded px-3 py-2 text-sm font-mono text-green-300 break-all">
-            {createdToken}
-          </code>
-          <p className="text-xs text-neutral-500 mt-2">
-            Run: <code className="text-amber-400">gear login {createdToken}</code>
+          <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 rounded px-3 py-2.5">
+            <code className="flex-1 text-sm font-mono text-neutral-200 break-all">
+              {createdToken}
+            </code>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(createdToken);
+              }}
+              className="shrink-0 text-neutral-600 hover:text-neutral-300 transition p-1"
+              title="Copy token"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+              </svg>
+            </button>
+          </div>
+          <p className="text-xs text-neutral-600 mt-2 font-mono">
+            Run: <span className="text-neutral-400">gear login {createdToken}</span>
           </p>
         </div>
       )}
 
       {loading ? (
-        <p className="text-sm text-neutral-500">Loading tokens...</p>
+        <p className="text-sm text-neutral-600 font-mono">Loading...</p>
       ) : tokens.length === 0 ? (
-        <p className="text-sm text-neutral-500">No tokens yet.</p>
+        <p className="text-sm text-neutral-600 font-mono">No tokens yet.</p>
       ) : (
-        <div className="space-y-2">
+        <div className="divide-y divide-neutral-800/30">
           {tokens.map((token) => (
             <div
               key={token.id}
-              className="flex items-center justify-between bg-neutral-900 border border-neutral-800 rounded-lg px-4 py-3"
+              className="flex items-center justify-between py-3"
             >
-              <div>
-                <span className="text-sm font-medium">{token.name}</span>
-                <span className="text-xs text-neutral-500 ml-3">
-                  Created {new Date(token.created_at).toLocaleDateString()}
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-mono text-neutral-200">
+                  {token.name}
+                </span>
+                <span className="text-xs text-neutral-600 font-mono">
+                  {new Date(token.created_at).toLocaleDateString()}
                 </span>
                 {token.last_used_at && (
-                  <span className="text-xs text-neutral-600 ml-3">
-                    Last used {new Date(token.last_used_at).toLocaleDateString()}
+                  <span className="text-xs text-neutral-700 font-mono">
+                    used {new Date(token.last_used_at).toLocaleDateString()}
                   </span>
                 )}
               </div>
               <button
                 onClick={() => handleRevoke(token.id)}
-                className="text-xs text-red-400 hover:text-red-300 transition"
+                className="text-xs text-neutral-600 hover:text-red-400 font-mono transition"
               >
                 Revoke
               </button>

@@ -1,14 +1,13 @@
+import { AGENT_ICONS, AGENT_LABELS } from "./icons";
+
 export function CompatibilityBadge({ platform }: { platform: string }) {
-  const colors: Record<string, string> = {
-    "claude-code": "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    "gemini-cli": "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  };
+  const Icon = AGENT_ICONS[platform];
+  const label = AGENT_LABELS[platform] ?? platform;
 
   return (
-    <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-mono border ${colors[platform] ?? "bg-neutral-700 text-neutral-300 border-neutral-600"}`}
-    >
-      {platform}
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono bg-neutral-900 border border-neutral-800 text-neutral-400">
+      {Icon && <Icon size={12} />}
+      {label}
     </span>
   );
 }

@@ -11,7 +11,20 @@ export const pushCommand = new Command("push")
   .description("Scan, sanitize, and publish your current agent setup")
   .option("--dry-run", "Preview the generated Gearfile without uploading")
   .option("--platform <platform>", "Override platform detection")
-  .action(async (opts: { dryRun?: boolean; platform?: string }) => {
+  .option("--name <name>", "Gear name (skips prompt)")
+  .option("--slug <slug>", "URL-safe slug (skips prompt)")
+  .option("--description <desc>", "Description (skips prompt)")
+  .option("--tags <tags>", "Comma-separated tags (skips prompt)")
+  .option("-y, --yes", "Skip confirmation prompt")
+  .action(async (opts: {
+    dryRun?: boolean;
+    platform?: string;
+    name?: string;
+    slug?: string;
+    description?: string;
+    tags?: string;
+    yes?: boolean;
+  }) => {
     const config = readConfig();
     const adapter = getAdapter(opts.platform ?? config.platform);
 
@@ -22,31 +35,36 @@ export const pushCommand = new Command("push")
       console.warn(`  Warning: ${warning}`);
     }
 
-    const { name } = await prompts({ type: "text", name: "name", message: "Gear name:" });
-    const { slug } = await prompts({
+    const name = opts.name ?? (await prompts({ type: "text", name: "name", message: "Gear name:" })).name;
+    const slug = opts.slug ?? (await prompts({
       type: "text",
       name: "slug",
       message: "Slug (URL-safe, lowercase):",
       validate: (v) => /^[a-z0-9][a-z0-9-]*$/.test(v) || "Must be lowercase alphanumeric with hyphens",
-    });
-    const { description } = await prompts({ type: "text", name: "description", message: "Description:" });
-    const { tagsStr } = await prompts({
-      type: "text",
-      name: "tagsStr",
-      message: "Tags (comma-separated):",
-    });
-    const tags = tagsStr
-      ? tagsStr.split(",").map((t: string) => t.trim().toLowerCase())
-      : [];
+    })).slug;
+    const description = opts.description ?? (await prompts({ type: "text", name: "description", message: "Description:" })).description;
+
+    let tags: string[];
+    if (opts.tags !== undefined) {
+      tags = opts.tags ? opts.tags.split(",").map((t) => t.trim().toLowerCase()) : [];
+    } else {
+      const { tagsStr } = await prompts({ type: "text", name: "tagsStr", message: "Tags (comma-separated):" });
+      tags = tagsStr ? tagsStr.split(",").map((t: string) => t.trim().toLowerCase()) : [];
+    }
+
+    if (!name || !slug || !description) {
+      console.error("Error: name, slug, and description are required.");
+      process.exit(1);
+    }
 
     const gearfile: Gearfile = {
+      ...scan.gearfile,
       name,
       slug,
       description,
       version: "1.0.0",
       compatibility: scan.gearfile.compatibility ?? [adapter.name],
       tags,
-      ...scan.gearfile,
     } as Gearfile;
 
     const body = `## About This Gear\n\n${description}\n`;
@@ -71,16 +89,18 @@ export const pushCommand = new Command("push")
       return;
     }
 
-    const { confirm } = await prompts({
-      type: "confirm",
-      name: "confirm",
-      message: "Does this look safe to publish?",
-      initial: true,
-    });
+    if (!opts.yes) {
+      const { confirm } = await prompts({
+        type: "confirm",
+        name: "confirm",
+        message: "Does this look safe to publish?",
+        initial: true,
+      });
 
-    if (!confirm) {
-      console.log("Aborted.");
-      return;
+      if (!confirm) {
+        console.log("Aborted.");
+        return;
+      }
     }
 
     if (!config.token) {

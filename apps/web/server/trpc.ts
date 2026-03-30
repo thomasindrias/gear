@@ -1,6 +1,7 @@
 import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import { createSupabaseAdmin } from "~/lib/supabase-server";
+import { createServerClient } from "@supabase/ssr";
 import { createHash } from "node:crypto";
 
 export interface ContextUser {
@@ -55,10 +56,31 @@ export async function createTRPCContext(
   if (!user) {
     const cookieHeader = opts.req.headers.get("cookie");
     if (cookieHeader) {
-      const { data: { user: authUser } } = await supabase.auth.getUser(
-        // Extract access token from cookie if present
-        cookieHeader.match(/sb-[^=]+-auth-token=([^;]+)/)?.[1] ?? "",
+      // Parse cookies from the request header
+      const cookies = Object.fromEntries(
+        cookieHeader.split("; ").map((c) => {
+          const [key, ...rest] = c.split("=");
+          return [key, rest.join("=")];
+        }),
       );
+
+      const ssrClient = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return Object.entries(cookies).map(([name, value]) => ({
+                name,
+                value,
+              }));
+            },
+            setAll() {},
+          },
+        },
+      );
+
+      const { data: { user: authUser } } = await ssrClient.auth.getUser();
       if (authUser) {
         const { data: dbUser } = await supabase
           .from("users")

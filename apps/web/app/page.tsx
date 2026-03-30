@@ -1,7 +1,15 @@
 import { createSupabaseAdmin } from "~/lib/supabase-server";
 import { Nav } from "./components/nav";
-import { ProfileCard } from "./components/profile-card";
 import { SearchBar } from "./components/search-bar";
+import { CopyButton } from "./components/copy-button";
+import { LeaderboardTable } from "./components/leaderboard-table";
+import {
+  ClaudeIcon,
+  GeminiIcon,
+  CursorIcon,
+  WindsurfIcon,
+  CopilotIcon,
+} from "./components/icons";
 
 interface PageProps {
   searchParams: Promise<{ q?: string; tags?: string; sort?: string }>;
@@ -15,7 +23,7 @@ export default async function HomePage({ searchParams }: PageProps) {
     .from("profiles")
     .select("*, users!inner(username, avatar_url)")
     .order("downloads_count", { ascending: false })
-    .limit(20);
+    .limit(50);
 
   if (params.q) {
     query = query.textSearch("search_vector", params.q, { type: "websearch" });
@@ -38,51 +46,64 @@ export default async function HomePage({ searchParams }: PageProps) {
   return (
     <>
       <Nav />
-      <main className="max-w-6xl mx-auto px-6">
-        <section className="py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
-            Your agent&apos;s next{" "}
-            <span className="text-amber-400">gear</span>
-          </h1>
-          <p className="text-neutral-400 text-lg mb-8 max-w-xl mx-auto">
-            Share, discover, and hot-swap AI agent configurations.
-            Like <span className="font-mono text-neutral-300">nvm</span>, but
-            for agentic environments.
-          </p>
-          <div className="inline-flex items-center bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2 font-mono text-sm mb-12">
-            <span className="text-neutral-500 mr-2">$</span>
-            <span className="text-amber-400">npm i -g gear-cli</span>
+      <main className="max-w-5xl mx-auto px-6">
+        {/* Hero */}
+        <section className="pt-16 pb-12 md:pt-24 md:pb-16 flex flex-col md:flex-row md:items-start gap-8 md:gap-16">
+          <div className="shrink-0">
+            <h1 className="text-6xl md:text-8xl font-black tracking-tighter leading-none font-mono uppercase">
+              GEAR
+            </h1>
+            <p className="text-[11px] tracking-[0.3em] text-neutral-600 uppercase mt-2 font-mono">
+              The open agent config ecosystem
+            </p>
           </div>
-
-          <SearchBar />
+          <p className="text-neutral-500 text-lg md:text-xl leading-relaxed md:pt-2 max-w-lg">
+            Portable AI agent configurations. Share your setup, discover
+            others, install with a single command.
+          </p>
         </section>
 
-        <section className="pb-20">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {profiles?.map((profile: any) => (
-              <ProfileCard
-                key={profile.id}
-                username={profile.users.username}
-                slug={profile.slug}
-                name={profile.name}
-                description={profile.description}
-                tags={profile.tags}
-                compatibility={profile.compatibility}
-                downloads_count={profile.downloads_count}
-                avatar_url={profile.users.avatar_url}
-              />
-            ))}
+        {/* Try it now + Compatible agents */}
+        <section className="pb-12 md:pb-16 flex flex-col md:flex-row gap-10 md:gap-20">
+          <div>
+            <h2 className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-4">
+              Try it now
+            </h2>
+            <div className="inline-flex items-center gap-3 bg-neutral-900/50 border border-neutral-800 rounded-lg px-5 py-3">
+              <code className="text-sm text-neutral-300 font-mono">
+                <span className="text-neutral-600">$ </span>
+                gear switch @user/setup
+              </code>
+              <CopyButton text="gear switch @user/setup" />
+            </div>
           </div>
 
-          {(!profiles || profiles.length === 0) && (
-            <div className="text-center py-20 text-neutral-500">
-              <p className="text-lg">No gears found.</p>
-              <p className="text-sm mt-2">
-                Be the first to publish one with{" "}
-                <code className="text-amber-400">gear push</code>
-              </p>
+          <div>
+            <h2 className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-4">
+              Available for these agents
+            </h2>
+            <div className="flex items-center gap-5">
+              <ClaudeIcon className="text-neutral-500 hover:text-neutral-200 transition" size={28} />
+              <GeminiIcon className="text-neutral-500 hover:text-neutral-200 transition" size={28} />
+              <CursorIcon className="text-neutral-500 hover:text-neutral-200 transition" size={28} />
+              <WindsurfIcon className="text-neutral-500 hover:text-neutral-200 transition" size={28} />
+              <CopilotIcon className="text-neutral-500 hover:text-neutral-200 transition" size={28} />
             </div>
-          )}
+          </div>
+        </section>
+
+        {/* Divider */}
+        <div className="border-t border-neutral-800/50" />
+
+        {/* Leaderboard */}
+        <section className="pt-10 pb-20">
+          <h2 className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-6">
+            Gears Leaderboard
+          </h2>
+
+          <SearchBar />
+
+          <LeaderboardTable profiles={profiles} />
         </section>
       </main>
     </>
