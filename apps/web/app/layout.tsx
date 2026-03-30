@@ -8,7 +8,7 @@ const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear.sh";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear-beige.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

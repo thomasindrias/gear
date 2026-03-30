@@ -117,7 +117,7 @@ export default async function ProfilePage({ params }: PageProps) {
     author: {
       "@type": "Person",
       name: profile.users.username,
-      url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear.sh"}/${profile.users.username}`,
+      url: `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear-beige.vercel.app"}/${profile.users.username}`,
     },
     applicationCategory: "AI Agent Configuration",
     operatingSystem: profile.compatibility?.join(", ") ?? "Any",

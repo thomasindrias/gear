@@ -14,7 +14,7 @@ export default function Error({
         href="/"
         className="text-sm font-mono font-bold tracking-tight text-neutral-300 hover:text-white transition"
       >
-        gear.sh
+        gear
       </Link>
       <h1 className="text-4xl font-black tracking-tighter font-mono text-neutral-300 mb-4 mt-12">
         Something went wrong

@@ -4,7 +4,7 @@ The package manager for AI agent configs. Share, discover, and hot-swap agent co
 
 Like `nvm`, but for agentic environments.
 
-[gear.sh](https://gear.sh) | [npm](https://www.npmjs.com/package/gearsh)
+[gear](https://gear-beige.vercel.app) | [npm](https://www.npmjs.com/package/gearsh)
 
 ## What is Gear?
 
@@ -28,7 +28,7 @@ npm i -g gearsh
 
 ### 2. Authenticate
 
-Sign in at [gear.sh](https://gear.sh), generate a personal access token in Settings, then:
+Sign in at [gear](https://gear-beige.vercel.app), generate a personal access token in Settings, then:
 
 ```bash
 gear login <your-token>
@@ -36,7 +36,7 @@ gear login <your-token>
 
 ### 3. Browse & Switch
 
-Find a gear on [gear.sh](https://gear.sh) and install it:
+Find a gear on [gear](https://gear-beige.vercel.app) and install it:
 
 ```bash
 gear switch @username/setup-name

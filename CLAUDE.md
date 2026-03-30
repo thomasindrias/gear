@@ -14,7 +14,7 @@ The package manager for AI agent configs. Share, discover, and hot-swap agent co
 ## Project Structure
 
 ```
-apps/web/          → Next.js web app (gear.sh)
+apps/web/          → Next.js web app (gear-beige.vercel.app)
 packages/cli/      → CLI tool (npx gearsh)
 packages/shared/   → Gearfile schema, parser, serializer
 packages/db/       → Supabase client factory and DB types

@@ -4,7 +4,7 @@ import { createSupabaseAdmin } from "~/lib/supabase-server";
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear.sh";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gear-beige.vercel.app";
   const supabase = createSupabaseAdmin();
 
   const { data: profiles } = await supabase
