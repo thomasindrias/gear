@@ -1,15 +1,33 @@
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-// TODO: Import AppRouter type once @gear/web package is created
-// import type { AppRouter } from "@gear/web/server/root.js";
 import { readConfig } from "./config.js";
+import type {
+  PublishInput,
+  PublishOutput,
+  DownloadInput,
+  DownloadOutput,
+} from "./types/api.js";
 
 const DEFAULT_REGISTRY = "https://gear.sh";
 
-export function createGearClient() {
+/**
+ * Minimal type-safe interface for the Gear API client
+ * Mirrors the tRPC router structure without requiring @gear/web dependency
+ */
+interface GearClient {
+  profile: {
+    publish: {
+      mutate: (input: PublishInput) => Promise<PublishOutput>;
+    };
+    download: {
+      query: (input: DownloadInput) => Promise<DownloadOutput>;
+    };
+  };
+}
+
+export function createGearClient(): GearClient {
   const config = readConfig();
   const registryUrl = config.registry_url ?? DEFAULT_REGISTRY;
 
-  // TODO: Type as AppRouter once web package is available
   return createTRPCClient<any>({
     links: [
       httpBatchLink({
@@ -22,5 +40,5 @@ export function createGearClient() {
         },
       }),
     ],
-  });
+  }) as unknown as GearClient;
 }
