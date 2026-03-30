@@ -3,12 +3,12 @@ import { readConfig, writeConfig } from "../config.js";
 
 export const loginCommand = new Command("login")
   .description("Authenticate with the Gear registry")
-  .argument("<token>", "Personal Access Token from gear.sh/settings")
+  .argument("<token>", "Personal Access Token from gear-beige.vercel.app/settings")
   .option("--platform <platform>", "Set default platform (claude-code or gemini-cli)")
   .option("--registry <url>", "Custom registry URL")
   .action((token: string, opts: { platform?: string; registry?: string }) => {
     if (!token.startsWith("gear_pat_")) {
-      console.error("Error: Token must start with 'gear_pat_'. Get one at gear.sh/settings");
+      console.error("Error: Token must start with 'gear_pat_'. Get one at gear-beige.vercel.app/settings");
       process.exit(1);
     }
 

@@ -14,7 +14,7 @@ export async function Nav() {
           href="/"
           className="text-sm font-mono font-bold tracking-tight text-neutral-300 hover:text-white transition"
         >
-          gear.sh
+          gear
         </Link>
         <div className="flex items-center gap-5">
           <Link

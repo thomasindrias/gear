@@ -121,5 +121,5 @@ export const pushCommand = new Command("push")
       is_public: !opts.private,
     });
 
-    console.log(`\nPublished! View at: gear.sh/@${result.username}/${result.slug}`);
+    console.log(`\nPublished! View at: gear-beige.vercel.app/@${result.username}/${result.slug}`);
   });

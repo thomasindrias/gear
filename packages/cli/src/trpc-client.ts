@@ -7,7 +7,7 @@ import type {
   DownloadOutput,
 } from "./types/api.js";
 
-const DEFAULT_REGISTRY = "https://gear.sh";
+const DEFAULT_REGISTRY = "https://gear-beige.vercel.app";
 
 /**
  * Minimal type-safe interface for the Gear API client
