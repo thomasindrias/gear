@@ -229,9 +229,27 @@ export default async function ProfilePage({ params }: PageProps) {
                   Instructions
                 </div>
                 <div className="bg-neutral-900/50 border border-neutral-800 rounded-lg p-4">
-                  <pre className="text-xs font-mono text-neutral-400 whitespace-pre-wrap">
-                    {instructions}
-                  </pre>
+                  {instructions.trim().split("\n").every((line) => line.trim().startsWith("@")) ? (
+                    <div className="flex flex-col gap-2">
+                      {instructions.trim().split("\n").map((line) => {
+                        const file = line.trim().replace(/^@/, "");
+                        return (
+                          <div key={file} className="flex items-center gap-2 text-xs font-mono text-neutral-500">
+                            <svg className="w-3.5 h-3.5 text-neutral-600 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M3 1.5h6.5L13 5v9.5H3z" />
+                              <path d="M9.5 1.5V5H13" />
+                            </svg>
+                            <span>References external config</span>
+                            <code className="text-neutral-400">{file}</code>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <pre className="text-xs font-mono text-neutral-400 whitespace-pre-wrap">
+                      {instructions}
+                    </pre>
+                  )}
                 </div>
               </div>
             )}
