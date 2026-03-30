@@ -1,5 +1,5 @@
 import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
+import rehypeSanitize from "rehype-sanitize";
 
 export function GearfileRenderer({ content }: { content: string }) {
   const match = content.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
@@ -19,7 +19,7 @@ export function GearfileRenderer({ content }: { content: string }) {
 
       {body.trim() && (
         <div className="prose prose-invert prose-sm max-w-none prose-headings:text-neutral-200 prose-headings:tracking-tight prose-p:text-neutral-400 prose-code:text-neutral-300 prose-code:font-mono prose-pre:bg-neutral-900/50 prose-pre:border prose-pre:border-neutral-800">
-          <ReactMarkdown rehypePlugins={[rehypeRaw]}>{body}</ReactMarkdown>
+          <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{body}</ReactMarkdown>
         </div>
       )}
     </div>

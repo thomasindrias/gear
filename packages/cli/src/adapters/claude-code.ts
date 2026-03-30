@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { homedir } from "node:os";
 import type { Gearfile } from "gear-shared";
 import type { PlatformAdapter, ConfigPaths } from "./types.js";
+import prompts from "prompts";
 
 export class ClaudeCodeAdapter implements PlatformAdapter {
   name = "claude-code" as const;
@@ -112,29 +113,52 @@ export class ClaudeCodeAdapter implements PlatformAdapter {
 
     writeFileSync(paths.settingsFile, JSON.stringify(settings, null, 2));
 
-    // 6. Download custom assets
+    // 6. Download custom assets (requires explicit user approval)
     if (gearfile.custom_assets?.length) {
+      console.log("\nThis gear includes custom assets that will be downloaded:");
       for (const asset of gearfile.custom_assets) {
-        let targetDir: string;
-        switch (asset.type) {
-          case "hook":
-            targetDir = paths.hooksDir;
-            break;
-          case "skill":
-            targetDir = paths.skillsDir;
-            break;
-          case "script":
-            targetDir = paths.scriptsDir;
-            break;
+        console.log(`  [${asset.type}] ${asset.name} — ${asset.source}`);
+      }
+
+      const hasHooks = gearfile.custom_assets.some((a) => a.type === "hook");
+      if (hasHooks) {
+        console.warn("\n  ⚠ WARNING: This gear includes hooks that will execute automatically.");
+        console.warn("  Only install hooks from authors you trust.");
+      }
+
+      const { proceed } = await prompts({
+        type: "confirm",
+        name: "proceed",
+        message: "Download and install these assets?",
+        initial: false,
+      });
+      if (!proceed) {
+        console.log("Skipped custom asset installation.");
+      } else {
+        for (const asset of gearfile.custom_assets) {
+          // Prevent path traversal
+          const safeName = asset.name.replace(/[/\\]/g, "_");
+          let targetDir: string;
+          switch (asset.type) {
+            case "hook":
+              targetDir = paths.hooksDir;
+              break;
+            case "skill":
+              targetDir = paths.skillsDir;
+              break;
+            case "script":
+              targetDir = paths.scriptsDir;
+              break;
+          }
+          mkdirSync(targetDir, { recursive: true });
+          const resp = await fetch(asset.source);
+          if (!resp.ok) {
+            console.warn(`Warning: Failed to download asset '${safeName}' from ${asset.source}`);
+            continue;
+          }
+          const content = await resp.text();
+          writeFileSync(join(targetDir, safeName), content);
         }
-        mkdirSync(targetDir, { recursive: true });
-        const resp = await fetch(asset.source);
-        if (!resp.ok) {
-          console.warn(`Warning: Failed to download asset '${asset.name}' from ${asset.source}`);
-          continue;
-        }
-        const content = await resp.text();
-        writeFileSync(join(targetDir, asset.name), content);
       }
     }
   }

@@ -11,7 +11,7 @@ const publishInput = z.object({
   description: z.string(),
   tags: z.array(z.string()),
   compatibility: z.array(z.string()),
-  gearfile_content: z.string(),
+  gearfile_content: z.string().max(100_000),
   is_public: z.boolean().default(true),
 });
 

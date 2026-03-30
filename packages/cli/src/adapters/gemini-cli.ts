@@ -9,6 +9,7 @@ import { join } from "node:path";
 import { homedir } from "node:os";
 import type { Gearfile } from "gear-shared";
 import type { PlatformAdapter, ConfigPaths } from "./types.js";
+import prompts from "prompts";
 
 export class GeminiCliAdapter implements PlatformAdapter {
   name = "gemini-cli" as const;
@@ -114,21 +115,41 @@ export class GeminiCliAdapter implements PlatformAdapter {
     mkdirSync(this.baseDir, { recursive: true });
     writeFileSync(paths.settingsFile, JSON.stringify(settings, null, 2));
 
-    // 7. Download custom assets (scripts only)
+    // 7. Download custom assets (requires explicit user approval)
     if (gearfile.custom_assets?.length) {
-      for (const asset of gearfile.custom_assets) {
-        if (asset.type === "hook") {
-          console.warn(`Warning: Hooks not supported on Gemini CLI. Skipping '${asset.name}'.`);
-          continue;
+      const applicable = gearfile.custom_assets.filter((a) => a.type !== "hook");
+      const skippedHooks = gearfile.custom_assets.filter((a) => a.type === "hook");
+      for (const h of skippedHooks) {
+        console.warn(`Warning: Hooks not supported on Gemini CLI. Skipping '${h.name}'.`);
+      }
+
+      if (applicable.length > 0) {
+        console.log("\nThis gear includes custom assets that will be downloaded:");
+        for (const asset of applicable) {
+          console.log(`  [${asset.type}] ${asset.name} — ${asset.source}`);
         }
-        const targetDir = asset.type === "skill" ? paths.skillsDir : paths.scriptsDir;
-        mkdirSync(targetDir, { recursive: true });
-        const resp = await fetch(asset.source);
-        if (!resp.ok) {
-          console.warn(`Warning: Failed to download asset '${asset.name}'`);
-          continue;
+
+        const { proceed } = await prompts({
+          type: "confirm",
+          name: "proceed",
+          message: "Download and install these assets?",
+          initial: false,
+        });
+        if (!proceed) {
+          console.log("Skipped custom asset installation.");
+        } else {
+          for (const asset of applicable) {
+            const safeName = asset.name.replace(/[/\\]/g, "_");
+            const targetDir = asset.type === "skill" ? paths.skillsDir : paths.scriptsDir;
+            mkdirSync(targetDir, { recursive: true });
+            const resp = await fetch(asset.source);
+            if (!resp.ok) {
+              console.warn(`Warning: Failed to download asset '${safeName}'`);
+              continue;
+            }
+            writeFileSync(join(targetDir, safeName), await resp.text());
+          }
         }
-        writeFileSync(join(targetDir, asset.name), await resp.text());
       }
     }
   }

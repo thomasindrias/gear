@@ -27,7 +27,7 @@ export function readConfig(): GearConfig {
 export function writeConfig(config: GearConfig): void {
   const dir = getGearDir();
   if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
+    mkdirSync(dir, { recursive: true, mode: 0o700 });
   }
   const path = configPath();
   writeFileSync(path, JSON.stringify(config, null, 2));
