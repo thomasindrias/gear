@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from "commander";
 import { loginCommand } from "./commands/login.js";
+import { pushCommand } from "./commands/push.js";
 import { switchCommand } from "./commands/switch.js";
 import { stashCommand } from "./commands/stash.js";
 import { restoreCommand } from "./commands/restore.js";
@@ -12,6 +13,7 @@ const program = new Command()
   .version("0.0.1");
 
 program.addCommand(loginCommand);
+program.addCommand(pushCommand);
 program.addCommand(switchCommand);
 program.addCommand(stashCommand);
 program.addCommand(restoreCommand);
