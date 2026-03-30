@@ -18,6 +18,9 @@ export interface Context {
 export async function createTRPCContext(
   opts: FetchCreateContextFnOptions,
 ): Promise<Context> {
+  // SECURITY NOTE: This uses the service role key which bypasses RLS.
+  // All authorization must be enforced in application code (router procedures).
+  // Every mutation must verify ctx.user ownership before modifying data.
   const supabase = createSupabaseAdmin();
   let user: ContextUser | null = null;
 
@@ -28,11 +31,11 @@ export async function createTRPCContext(
     const hash = createHash("sha256").update(token).digest("hex");
     const { data: tokenRow } = await supabase
       .from("cli_tokens")
-      .select("user_id")
+      .select("user_id, expires_at")
       .eq("token_hash", hash)
       .single();
 
-    if (tokenRow) {
+    if (tokenRow && (!tokenRow.expires_at || new Date(tokenRow.expires_at) > new Date())) {
       // Update last_used_at (fire and forget)
       void supabase
         .from("cli_tokens")

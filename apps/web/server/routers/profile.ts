@@ -3,6 +3,23 @@ import { TRPCError } from "@trpc/server";
 import { router, publicProcedure, authedProcedure } from "../trpc";
 import { parseGearfile } from "gear-shared";
 import { runAudits } from "../lib/auditor";
+
+// Simple in-memory rate limiter for download counting (per profile per user/IP, 1 per hour)
+const downloadCounts = new Map<string, number>();
+function shouldCountDownload(profileId: string, userId: string | null): boolean {
+  const key = `${profileId}:${userId ?? "anon"}`;
+  const now = Date.now();
+  const lastTime = downloadCounts.get(key);
+  if (lastTime && now - lastTime < 3600_000) return false;
+  downloadCounts.set(key, now);
+  // Evict old entries periodically
+  if (downloadCounts.size > 10_000) {
+    for (const [k, v] of downloadCounts) {
+      if (now - v > 3600_000) downloadCounts.delete(k);
+    }
+  }
+  return true;
+}
 import { enrichPlugins, enrichSkills } from "../lib/plugin-enricher";
 
 const publishInput = z.object({
@@ -119,7 +136,9 @@ export const profileRouter = router({
         }
       }
 
-      void ctx.supabase.rpc("increment_downloads", { profile_id: data.id });
+      if (shouldCountDownload(data.id, ctx.user?.id ?? null)) {
+        void ctx.supabase.rpc("increment_downloads", { profile_id: data.id });
+      }
 
       return { gearfile_content: data.gearfile_content };
     }),
