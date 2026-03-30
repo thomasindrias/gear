@@ -23,16 +23,7 @@ export function SkillPills({
 }) {
   const [expanded, setExpanded] = useState(false);
 
-  if (skills.length === 0) {
-    return (
-      <div>
-        <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-3 border-b border-neutral-800/50 pb-2">
-          Skills (0)
-        </div>
-        <p className="text-xs text-neutral-600 font-mono">No skills configured</p>
-      </div>
-    );
-  }
+  if (skills.length === 0) return null;
 
   const metaByName = new Map(
     (skillMeta ?? []).map((m) => [m.name, m]),
@@ -43,7 +34,7 @@ export function SkillPills({
 
   return (
     <div>
-      <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-3 border-b border-neutral-800/50 pb-2">
+      <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-3 border-b border-neutral-800/40 pb-2">
         Skills ({skills.length})
       </div>
       <div className="flex flex-col">

@@ -47,7 +47,7 @@ export function LeaderboardTable({
   return (
     <div className="mt-6">
       {/* Sort tabs */}
-      <div className="flex items-center gap-6 mb-6 border-b border-neutral-800/50 pb-3">
+      <div className="flex items-center gap-6 mb-6 border-b border-neutral-800/40 pb-3">
         <SortTab
           active={sort === "all"}
           onClick={() => setSort("all")}
@@ -78,7 +78,7 @@ export function LeaderboardTable({
           <a
             key={profile.id}
             href={`/${profile.users.username}/${profile.slug}`}
-            className="grid grid-cols-[2.5rem_1fr_auto] items-center px-2 py-3.5 hover:bg-neutral-900/50 transition-colors group rounded"
+            className="grid grid-cols-[2.5rem_1fr_auto] items-center px-3 py-3.5 hover:bg-neutral-900/40 transition-colors group rounded-lg"
           >
             <span className="text-sm font-mono text-neutral-600 tabular-nums">
               {i + 1}

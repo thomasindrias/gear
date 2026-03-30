@@ -31,8 +31,10 @@ export function VisibilityToggle({
       <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-2">
         Visibility
       </div>
-      <div className="flex items-center gap-2">
-        <span className={isPublic ? "text-green-400" : "text-amber-400"}>●</span>
+      <div className="flex items-center gap-3">
+        <span className={`text-[8px] ${isPublic ? "text-emerald-400" : "text-amber-400"}`}>
+          ●
+        </span>
         <span className="text-sm text-neutral-400 font-mono">
           {isPublic ? "Public" : "Private"}
         </span>
@@ -40,9 +42,17 @@ export function VisibilityToggle({
           <button
             onClick={handleToggle}
             disabled={loading}
-            className="text-[10px] text-neutral-600 hover:text-neutral-300 font-mono ml-1 transition disabled:opacity-50"
+            className={`relative w-8 h-[18px] rounded-full transition-colors duration-200 disabled:opacity-50 ml-auto ${
+              isPublic ? "bg-emerald-500/30" : "bg-neutral-700"
+            }`}
           >
-            [{loading ? "..." : "toggle"}]
+            <span
+              className={`absolute top-[3px] w-3 h-3 rounded-full transition-all duration-200 ${
+                isPublic
+                  ? "left-[14px] bg-emerald-400"
+                  : "left-[3px] bg-neutral-400"
+              }`}
+            />
           </button>
         )}
       </div>

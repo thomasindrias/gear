@@ -30,16 +30,7 @@ export function PluginList({
   const [expanded, setExpanded] = useState(false);
   const INITIAL_SHOW = 5;
 
-  if (plugins.length === 0) {
-    return (
-      <div>
-        <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-3 border-b border-neutral-800/50 pb-2">
-          Plugins (0)
-        </div>
-        <p className="text-xs text-neutral-600 font-mono">No plugins configured</p>
-      </div>
-    );
-  }
+  if (plugins.length === 0) return null;
 
   const metaMap = new Map(
     (metadata ?? []).map((m) => [`${m.name}:${m.marketplace}`, m]),
@@ -50,7 +41,7 @@ export function PluginList({
 
   return (
     <div>
-      <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-3 border-b border-neutral-800/50 pb-2">
+      <div className="text-[11px] tracking-[0.2em] text-neutral-600 uppercase font-mono mb-3 border-b border-neutral-800/40 pb-2">
         Plugins ({plugins.length})
       </div>
       <div className="flex flex-col">
